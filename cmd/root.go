@@ -13,7 +13,8 @@ var rootCmd = &cobra.Command{
 	Long: `Sygkro is a project templating and synchronization tool that helps you manage your projects with ease.
 	It allows you to create, update any git project.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
+		// print the help message
+		cmd.Help()
 	},
 }
 
