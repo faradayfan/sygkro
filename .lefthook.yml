@@ -1,0 +1,16 @@
+commit-msg:
+  commands:
+    conventional-commit:
+      run: .git_hooks/validate-commit.py {1}
+
+pre-commit:
+  commands:
+    setup:
+      run: scripts/setup.sh
+    lint:
+      run: scripts/ci-pre-build.sh
+
+pre-push:
+  commands:
+    branch-check:
+      run: .git_hooks/validate-branch.py {1}

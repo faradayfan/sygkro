@@ -1,0 +1,4 @@
+shfmt 3.11.0
+lefthook 1.11.3
+golang 1.24.1
+github-cli 2.69.0
