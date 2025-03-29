@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1-alpha](https://github.com/faradayfan/sygkro/compare/v0.2.0...v0.2.1-alpha) (2025-03-29)
+
+
+### Bug Fixes
+
+* fixing release please ([2dead61](https://github.com/faradayfan/sygkro/commit/2dead61e9ab0bed65cf9ea177908e2379426cfc5))
+
 ## [0.2.0](https://github.com/faradayfan/sygkro/compare/v0.1.0...v0.2.0) (2025-03-29)
 
 
