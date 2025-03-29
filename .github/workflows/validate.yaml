@@ -1,0 +1,22 @@
+name: "Validate"
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+# {% raw %}
+jobs:
+  validate:
+    name: "Validate"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: asdf-vm/actions/install@v3
+      - run: ./scripts/ci-setup.sh
+      - run: ./scripts/ci-pre-build.sh
+      - run: ./scripts/ci-build.sh
+# {% endraw %}

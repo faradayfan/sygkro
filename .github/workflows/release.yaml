@@ -1,0 +1,64 @@
+name: Release {{ cookiecutter.project_slug }}
+# {% raw %}
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  release:
+    name: "Release"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release-created: ${{ steps.release.outputs.release_created }}
+      release-version: ${{ steps.release.outputs.version }}
+      tag-name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .github/release/config.json
+          manifest-file: .github/release/manifest.json
+      - uses: actions/checkout@v4
+      - name: tag major and minor versions
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/googleapis/release-please-action.git"
+          git tag -d v${{ steps.release.outputs.major }} || true
+          git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git push origin :v${{ steps.release.outputs.major }} || true
+          git push origin :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+          git tag -a v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
+          git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
+          git push origin v${{ steps.release.outputs.major }}
+          git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
+
+  publish:
+    name: "Publish"
+    runs-on: ubuntu-latest
+    needs: release
+    if: ${{ needs.release.outputs.release-created }}
+    permissions:
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ needs.release.outputs.release-version }}
+      GIT_SHA: ${{ github.sha }}
+      TAG_NAME: ${{ needs.release.outputs.tag-name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: asdf-vm/actions/install@v3
+      - run: ./scripts/ci-setup.sh
+      - run: ./scripts/ci-pre-build.sh
+      - run: ./scripts/ci-build.sh
+      - run: ./scripts/ci-pre-deploy.sh
+      - run: ./scripts/ci-deploy.sh
+      - run: ./scripts/ci-post-deploy.sh
+# {% endraw %}
