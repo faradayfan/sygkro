@@ -5,9 +5,11 @@
   "packages": {
     ".": {
       "extra-files": [
-        "README.md"
+        "README.md",
+        "cmd/version.go"
       ],
-      "prerelease": true
+      "prerelease": true,
+      "prerelease-type": "alpha"
     }
   }
 }

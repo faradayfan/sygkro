@@ -1,5 +1,4 @@
-name: Release {{ cookiecutter.project_slug }}
-# {% raw %}
+name: Release Sygkro
 on:
   push:
     branches:
@@ -61,4 +60,3 @@ jobs:
       - run: ./scripts/ci-pre-deploy.sh
       - run: ./scripts/ci-deploy.sh
       - run: ./scripts/ci-post-deploy.sh
-# {% endraw %}

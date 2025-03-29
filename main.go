@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/faradayfan/sygkro/cmd"
+)
 
 func main() {
-	fmt.Println("sygkro")
+	cmd.Execute()
 }
