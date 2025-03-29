@@ -85,7 +85,7 @@ var projectCreateCmd = &cobra.Command{
 		}
 
 		// Process the project template: render the "{{ .slug }}" subdirectory into the destination.
-		if err := engine.ProcessTemplateDir(expectedSubDir, destination, inputs); err != nil {
+		if err := engine.ProcessTemplateDir(expectedSubDir, destination, inputs, tmplConfig.Options); err != nil {
 			return fmt.Errorf("failed to process template subdirectory: %w", err)
 		}
 
