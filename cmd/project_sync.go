@@ -8,21 +8,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	projectCmd.AddCommand(projectSyncCmd)
-}
-
 var projectSyncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Syncs a project to a template",
 	Long:  `Syncs a project to a template`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+
+		syncFilePath := cmd.Flag("config").Value.String()
+
 		// Step 1: Ensure .sygkro.sync.yaml exists in the current directory.
-		syncConfigPath := config.SyncConfigFileName
-		syncConfig, err := config.ReadSyncConfig(syncConfigPath)
+		syncConfig, err := config.ReadSyncConfig(syncFilePath)
 		if err != nil {
 			return err
 		}
+
+		// git-ref
+		ref := cmd.Flag("git-ref").Value.String()
+		if ref != "" {
+			syncConfig.Source.TemplateTrackingRef = ref
+		}
+
 		// Step 2: Clone the template repository at the latest commit for the tracking ref.
 		latest, err := git.GetTemplateDir(syncConfig.Source.TemplatePath, syncConfig.Source.TemplateTrackingRef)
 		if err != nil {
@@ -48,7 +53,7 @@ var projectSyncCmd = &cobra.Command{
 
 		// update the sync config with the latest commit SHA
 		syncConfig.Source.TemplateVersion = latest.CommitSHA
-		err = syncConfig.Write(syncConfigPath)
+		err = syncConfig.Write(syncFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to write sync config: %w", err)
 		}
@@ -57,4 +62,10 @@ var projectSyncCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+func init() {
+	projectCmd.AddCommand(projectSyncCmd)
+	projectSyncCmd.Flags().StringP("config", "c", config.SyncConfigFileName, "Path to the sync config file")
+	projectSyncCmd.Flags().StringP("git-ref", "r", "", "Git reference to use (branch, tag, or commit SHA)")
 }

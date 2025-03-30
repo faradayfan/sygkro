@@ -42,7 +42,7 @@ func ComputeDiff(templatePath string, projectPath string, syncConfig *config.Syn
 	}
 
 	// 4. Compute a diff between the rendered "ideal" template and the actual project directory.
-	diffOutput, err := DiffDirs(idealDir, projectPath)
+	diffOutput, err := DiffDirs(idealDir, projectPath, []string{syncConfig.Path})
 	if err != nil {
 		return "", fmt.Errorf("failed to compute diff: %w", err)
 	}
@@ -54,16 +54,16 @@ func ComputeDiff(templatePath string, projectPath string, syncConfig *config.Syn
 // DiffDirs creates temporary Git repositories from two directories,
 // commits their contents, and computes a unified diff between the resulting trees.
 // It returns the diff as a unified diff string.
-func DiffDirs(dir1, dir2 string) (string, error) {
+func DiffDirs(dir1, dir2 string, ignoreFilesRegex []string) (string, error) {
 	// Commit the first directory.
-	_, tree1, cleanup1, err := commitDirToTempRepo(dir1)
+	_, tree1, cleanup1, err := commitDirToTempRepo(dir1, ignoreFilesRegex)
 	if err != nil {
 		return "", fmt.Errorf("failed to commit directory %s: %w", dir1, err)
 	}
 	defer cleanup1()
 
 	// Commit the second directory.
-	_, tree2, cleanup2, err := commitDirToTempRepo(dir2)
+	_, tree2, cleanup2, err := commitDirToTempRepo(dir2, ignoreFilesRegex)
 	if err != nil {
 		return "", fmt.Errorf("failed to commit directory %s: %w", dir2, err)
 	}
@@ -86,7 +86,7 @@ func DiffDirs(dir1, dir2 string) (string, error) {
 // commitDirToTempRepo creates a temporary Git repository from the given directory.
 // It copies all the files from the directory into the repository, stages, and commits them.
 // Returns the repository, the commit's tree, a cleanup function, and an error.
-func commitDirToTempRepo(dir string) (*git.Repository, *object.Tree, func(), error) {
+func commitDirToTempRepo(dir string, ignoreFilesRegex []string) (*git.Repository, *object.Tree, func(), error) {
 	// Create a temporary directory for the repository.
 	tmpDir, err := os.MkdirTemp("", "diff-repo-*")
 	if err != nil {
@@ -104,9 +104,7 @@ func commitDirToTempRepo(dir string) (*git.Repository, *object.Tree, func(), err
 	}
 
 	copyOpts := CopyOptions{
-		IgnoreFilesRegex: []string{
-			config.SyncConfigFileName,
-		},
+		IgnoreFilesRegex: ignoreFilesRegex,
 	}
 	// Copy the entire contents of the source directory to the temporary repository.
 	if err := copyDir(dir, tmpDir, copyOpts); err != nil {

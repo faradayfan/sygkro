@@ -13,12 +13,19 @@ var projectDiffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Outputs a git diff style output between the project and its template",
 	RunE: func(cmd *cobra.Command, args []string) error {
+
 		// Step 1: Ensure .sygkro.sync.yaml exists in the current directory.
-		syncConfigPath := config.SyncConfigFileName
-		syncConfig, err := config.ReadSyncConfig(syncConfigPath)
+		syncFilePath := cmd.Flag("config").Value.String()
+		syncConfig, err := config.ReadSyncConfig(syncFilePath)
 		if err != nil {
 			return err
 		}
+
+		gitRef := cmd.Flag("git-ref").Value.String()
+		if gitRef != "" {
+			syncConfig.Source.TemplateTrackingRef = gitRef
+		}
+
 		// Step 2: Clone the template repository at the latest commit for the tracking ref.
 		latest, err := git.GetTemplateDir(syncConfig.Source.TemplatePath, syncConfig.Source.TemplateTrackingRef)
 		if err != nil {
@@ -44,4 +51,6 @@ var projectDiffCmd = &cobra.Command{
 
 func init() {
 	projectCmd.AddCommand(projectDiffCmd)
+	projectDiffCmd.Flags().StringP("config", "c", config.SyncConfigFileName, "Path to the sync config file")
+	projectDiffCmd.Flags().StringP("git-ref", "r", "", "Git reference to use (branch, tag, or commit SHA)")
 }

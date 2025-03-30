@@ -5,6 +5,7 @@ const (
 )
 
 type SyncConfig struct {
+	Path   string            `yaml:"-"` // ignore when serializing
 	Source SourceConfig      `yaml:"source"`
 	Inputs map[string]string `yaml:"inputs"`
 }
@@ -23,6 +24,8 @@ func (s *SyncConfig) Write(path string) error {
 func ReadSyncConfig(path string) (*SyncConfig, error) {
 	syncConfig := &SyncConfig{}
 	err := ReadYAML(path, syncConfig)
+
+	syncConfig.Path = path
 
 	if err != nil {
 		return nil, err
