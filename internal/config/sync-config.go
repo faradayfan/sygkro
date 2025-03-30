@@ -19,3 +19,14 @@ type SourceConfig struct {
 func (s *SyncConfig) Write(path string) error {
 	return WriteYAML(path, s)
 }
+
+func ReadSyncConfig(path string) (*SyncConfig, error) {
+	syncConfig := &SyncConfig{}
+	err := ReadYAML(path, syncConfig)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return syncConfig, nil
+}

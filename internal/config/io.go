@@ -23,3 +23,18 @@ func WriteYAML(filePath string, data interface{}) error {
 	}
 	return nil
 }
+
+func ReadYAML(filePath string, out interface{}) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to open YAML file: %w", err)
+	}
+	defer file.Close()
+
+	decoder := yaml.NewDecoder(file)
+	if err := decoder.Decode(out); err != nil {
+		return fmt.Errorf("failed to decode YAML: %w", err)
+	}
+
+	return nil
+}

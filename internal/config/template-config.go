@@ -23,3 +23,14 @@ type TemplateOptions struct {
 func (s *TemplateConfig) Write(path string) error {
 	return WriteYAML(path, s)
 }
+
+func ReadTemplateConfig(path string) (*TemplateConfig, error) {
+	templateConfig := &TemplateConfig{}
+	err := ReadYAML(path, templateConfig)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return templateConfig, nil
+}

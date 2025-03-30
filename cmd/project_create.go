@@ -11,7 +11,6 @@ import (
 	"github.com/faradayfan/sygkro/internal/engine"
 	"github.com/faradayfan/sygkro/internal/git"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 var projectCreateCmd = &cobra.Command{
@@ -58,13 +57,9 @@ var projectCreateCmd = &cobra.Command{
 
 		// Read the template configuration file.
 		configFilePath := filepath.Join(templateResults.Path, config.TemplateConfigFileName)
-		configContent, err := os.ReadFile(configFilePath)
+		tmplConfig, err := config.ReadTemplateConfig(configFilePath)
 		if err != nil {
-			return fmt.Errorf("failed to read %s: %w", config.TemplateConfigFileName, err)
-		}
-		var tmplConfig config.TemplateConfig
-		if err := yaml.Unmarshal(configContent, &tmplConfig); err != nil {
-			return fmt.Errorf("failed to unmarshal %s: %w", config.TemplateConfigFileName, err)
+			return fmt.Errorf("failed to read template config file: %w", err)
 		}
 
 		// Prompt the user for each input defined in the configuration.
@@ -104,13 +99,20 @@ var projectCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to process template subdirectory: %w", err)
 		}
 
+		// split string by "/" and return last element
+		trackingRef := strings.Split(templateResults.HeadRef, "/")
+		var trackingRefString string = ""
+		if len(trackingRef) > 0 {
+			trackingRefString = trackingRef[len(trackingRef)-1]
+		}
+
 		// Build the sync configuration.
 		syncConfig := config.SyncConfig{
 			Source: config.SourceConfig{
 				TemplatePath:        templateRef, // Preserve the original reference.
 				TemplateName:        tmplConfig.Name,
 				TemplateVersion:     templateResults.CommitSHA,
-				TemplateTrackingRef: templateResults.HeadRef,
+				TemplateTrackingRef: trackingRefString,
 			},
 			Inputs: inputs,
 		}
@@ -125,7 +127,6 @@ var projectCreateCmd = &cobra.Command{
 }
 
 func init() {
-	// Assuming you have a parent command "projectCmd".
 	projectCmd.AddCommand(projectCreateCmd)
 	projectCreateCmd.Flags().StringP("template", "s", "", "Path or Git repo reference to the template (required)")
 	projectCreateCmd.Flags().StringP("target", "t", ".", "Target directory for the new project")
