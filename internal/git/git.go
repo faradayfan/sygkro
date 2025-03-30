@@ -25,6 +25,7 @@ func GetTemplateDir(templateRef string, reference string) (string, string, strin
 	// Check if the template reference itself contains a Git ref (indicated by '@').
 	var (
 		isCommit bool = false
+		isTag    bool = false
 	)
 	gitRef := ""
 	if strings.Contains(templateRef, "@") {
@@ -79,6 +80,7 @@ func GetTemplateDir(templateRef string, reference string) (string, string, strin
 			cloneOpts.ReferenceName = plumbing.NewTagReferenceName(gitRef)
 			cloneOpts.SingleBranch = true
 			repo, err = git.PlainClone(tmpDir, false, cloneOpts)
+			isTag = true
 		}
 
 		if err != nil {
@@ -116,6 +118,14 @@ func GetTemplateDir(templateRef string, reference string) (string, string, strin
 		}
 
 		headRef := head.Name().String()
+		if isTag {
+			tagHead, err := repo.Tag(gitRef)
+			if err != nil {
+				return "", "", "", nil, fmt.Errorf("failed to get tag %s: %w", gitRef, err)
+			}
+			headRef = tagHead.Name().String()
+
+		}
 		commitSHA := head.Hash().String()
 
 		cleanup := func() {
