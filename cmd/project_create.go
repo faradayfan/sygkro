@@ -37,26 +37,27 @@ var projectCreateCmd = &cobra.Command{
 		}
 
 		// Use the git package to get a local template directory and the HEAD commit SHA.
-		localTemplateDir, commitSHA, ref, cleanup, err := git.GetTemplateDir(templateRef, gitRef)
+		// localTemplateDir, commitSHA, ref, cleanup, err := git.GetTemplateDir(templateRef, gitRef)
+		templateResults, err := git.GetTemplateDir(templateRef, gitRef)
 		if err != nil {
 			return err
 		}
 		// Ensure cleanup of temporary directory if needed.
-		defer cleanup()
+		defer templateResults.Cleanup()
 
 		// Ensure the local template directory exists.
-		if _, err := os.Stat(localTemplateDir); err != nil {
-			return fmt.Errorf("template directory %s does not exist: %w", localTemplateDir, err)
+		if _, err := os.Stat(templateResults.Path); err != nil {
+			return fmt.Errorf("template directory %s does not exist: %w", templateResults.Path, err)
 		}
 
 		// Validate that the template directory contains the required subdirectory "{{ .slug }}".
-		expectedSubDir := filepath.Join(localTemplateDir, "{{ .slug }}")
+		expectedSubDir := filepath.Join(templateResults.Path, "{{ .slug }}")
 		if stat, err := os.Stat(expectedSubDir); err != nil || !stat.IsDir() {
-			return fmt.Errorf("template directory %s must contain a subdirectory named '{{ .slug }}'", localTemplateDir)
+			return fmt.Errorf("template directory %s must contain a subdirectory named '{{ .slug }}'", templateResults.Path)
 		}
 
 		// Read the template configuration file.
-		configFilePath := filepath.Join(localTemplateDir, config.TemplateConfigFileName)
+		configFilePath := filepath.Join(templateResults.Path, config.TemplateConfigFileName)
 		configContent, err := os.ReadFile(configFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to read %s: %w", config.TemplateConfigFileName, err)
@@ -108,8 +109,8 @@ var projectCreateCmd = &cobra.Command{
 			Source: config.SourceConfig{
 				TemplatePath:        templateRef, // Preserve the original reference.
 				TemplateName:        tmplConfig.Name,
-				TemplateVersion:     commitSHA,
-				TemplateTrackingRef: ref,
+				TemplateVersion:     templateResults.CommitSHA,
+				TemplateTrackingRef: templateResults.HeadRef,
 			},
 			Inputs: inputs,
 		}
