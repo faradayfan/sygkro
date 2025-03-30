@@ -9,13 +9,14 @@ import (
 
 	"github.com/faradayfan/sygkro/internal/config"
 	"github.com/faradayfan/sygkro/internal/engine"
+	"github.com/faradayfan/sygkro/internal/git"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
 
 var projectCreateCmd = &cobra.Command{
-	Use:   "create --template [template-name]",
-	Short: "Generates a new project from a template directory into a new project directory under the target directory",
+	Use:   "create --template [template-ref]",
+	Short: "Generates a new project from a template directory or Git repo into a new project directory under the target directory",
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Get target directory from flag.
@@ -24,25 +25,38 @@ var projectCreateCmd = &cobra.Command{
 			return err
 		}
 
-		// Get the template directory from the required --template flag.
-		templateDir, err := cmd.Flags().GetString("template")
+		// Get the template reference from the required --template flag.
+		templateRef, err := cmd.Flags().GetString("template")
 		if err != nil {
 			return err
 		}
 
-		// Ensure the template directory exists.
-		if _, err := os.Stat(templateDir); err != nil {
-			return fmt.Errorf("template directory %s does not exist: %w", templateDir, err)
+		gitRef, err := cmd.Flags().GetString("git-ref")
+		if err != nil {
+			return err
+		}
+
+		// Use the git package to get a local template directory and the HEAD commit SHA.
+		localTemplateDir, commitSHA, ref, cleanup, err := git.GetTemplateDir(templateRef, gitRef)
+		if err != nil {
+			return err
+		}
+		// Ensure cleanup of temporary directory if needed.
+		defer cleanup()
+
+		// Ensure the local template directory exists.
+		if _, err := os.Stat(localTemplateDir); err != nil {
+			return fmt.Errorf("template directory %s does not exist: %w", localTemplateDir, err)
 		}
 
 		// Validate that the template directory contains the required subdirectory "{{ .slug }}".
-		expectedSubDir := filepath.Join(templateDir, "{{ .slug }}")
+		expectedSubDir := filepath.Join(localTemplateDir, "{{ .slug }}")
 		if stat, err := os.Stat(expectedSubDir); err != nil || !stat.IsDir() {
-			return fmt.Errorf("template directory %s must contain a subdirectory named '{{ .slug }}'", templateDir)
+			return fmt.Errorf("template directory %s must contain a subdirectory named '{{ .slug }}'", localTemplateDir)
 		}
 
 		// Read the template configuration file.
-		configFilePath := filepath.Join(templateDir, config.TemplateConfigFileName)
+		configFilePath := filepath.Join(localTemplateDir, config.TemplateConfigFileName)
 		configContent, err := os.ReadFile(configFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to read %s: %w", config.TemplateConfigFileName, err)
@@ -89,12 +103,13 @@ var projectCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to process template subdirectory: %w", err)
 		}
 
-		// Build the sync configuration (using a placeholder for version info for now).
+		// Build the sync configuration.
 		syncConfig := config.SyncConfig{
 			Source: config.SourceConfig{
-				TemplatePath:    templateDir,
-				TemplateName:    tmplConfig.Name,
-				TemplateVersion: tmplConfig.Version,
+				TemplatePath:        templateRef, // Preserve the original reference.
+				TemplateName:        tmplConfig.Name,
+				TemplateVersion:     commitSHA,
+				TemplateTrackingRef: ref,
 			},
 			Inputs: inputs,
 		}
@@ -111,7 +126,8 @@ var projectCreateCmd = &cobra.Command{
 func init() {
 	// Assuming you have a parent command "projectCmd".
 	projectCmd.AddCommand(projectCreateCmd)
-	projectCreateCmd.Flags().StringP("template", "s", "", "Path to the template directory (required)")
+	projectCreateCmd.Flags().StringP("template", "s", "", "Path or Git repo reference to the template (required)")
 	projectCreateCmd.Flags().StringP("target", "t", ".", "Target directory for the new project")
+	projectCreateCmd.Flags().StringP("git-ref", "r", "", "Git reference (branch, tag, or commit SHA) to use for the template")
 	projectCreateCmd.MarkFlagRequired("template")
 }

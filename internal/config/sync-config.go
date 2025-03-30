@@ -10,9 +10,10 @@ type SyncConfig struct {
 }
 
 type SourceConfig struct {
-	TemplatePath    string `yaml:"template_path"`
-	TemplateName    string `yaml:"template_name"`
-	TemplateVersion string `yaml:"template_version"`
+	TemplatePath        string `yaml:"template_path"`
+	TemplateName        string `yaml:"template_name"`
+	TemplateVersion     string `yaml:"template_version"`
+	TemplateTrackingRef string `yaml:"template_tracking_ref"`
 }
 
 func (s *SyncConfig) Write(path string) error {
