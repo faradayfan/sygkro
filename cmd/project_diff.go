@@ -27,22 +27,21 @@ var projectDiffCmd = &cobra.Command{
 		}
 
 		// Step 2: Clone the template repository at the latest commit for the tracking ref.
-		latest, err := git.GetTemplateDir(syncConfig.Source.TemplatePath, syncConfig.Source.TemplateTrackingRef)
+		templateDir, err := git.GetTemplateDir(syncConfig.Source.TemplatePath, syncConfig.Source.TemplateTrackingRef)
 		if err != nil {
 			return fmt.Errorf("failed to clone template repository: %w", err)
 		}
-
-		defer latest.Cleanup()
+		defer templateDir.Cleanup()
 
 		// Step 3: Compute a diff between the rendered template and the actual project.
-		diff, err := git.ComputeDiff(latest.Path, ".", syncConfig)
+		diff, err := git.ComputeDiff(templateDir.Path, ".", syncConfig.Source.TemplateVersion, syncConfig)
 		if err != nil {
 			return fmt.Errorf("failed to compute diff: %w", err)
 		}
 		if diff == "" {
 			fmt.Println("No differences found.")
+			return nil
 		}
-
 		fmt.Println(diff)
 
 		return nil
