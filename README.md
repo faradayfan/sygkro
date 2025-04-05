@@ -2,7 +2,7 @@
 
 > This project is in early development
 
-**sygkro** is a project templating and synchronization tool written in Go. It helps you create, manage, and update projects based on customizable templates, keeping your projects in sync with evolving boilerplate over time.
+**sygkro** is a project templating and synchronization tool written in Go inspired by [Cookiecutter](https://github.com/cookiecutter/cookiecutter) and [Cruft](https://github.com/cruft/cruft). It helps you create, manage, and update projects based on customizable templates, keeping your projects in sync with evolving boilerplate over time.
 
 ## Table of Contents
 
