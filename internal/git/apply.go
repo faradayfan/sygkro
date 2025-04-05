@@ -7,7 +7,7 @@ import (
 )
 
 func ApplyDiff(repoPath string, diff string) error {
-	cmd := exec.Command("git", "apply")
+	cmd := exec.Command("git", "apply", "-3")
 	cmd.Dir = repoPath
 	cmd.Stdin = bytes.NewBufferString(diff)
 

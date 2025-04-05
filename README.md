@@ -16,7 +16,7 @@
       - [Creating a New Template](#creating-a-new-template)
       - [Creating a New Project](#creating-a-new-project)
       - [Viewing Differences](#viewing-differences)
-      - [Applying Diffs](#applying-diffs)
+      - [Syncing Projects with Template Changes](#syncing-projects-with-template-changes)
     - [Configuration Files](#configuration-files)
     - [Git \& Diff Integration](#git--diff-integration)
     - [Contributing](#contributing)
@@ -104,9 +104,22 @@ This command:
 3. Re-renders the template using the stored inputs into a temporary “ideal” state.
 4. Computes a unified diff between the ideal output and the current project.
 
-#### Applying Diffs
+#### Syncing Projects with Template Changes
 
-This functionality has not been implemented yet, but you can use the `sygkro project diff` command to generate a diff output. The output can be piped into Git for applying changes. This process requires manual edits to the diff output and instructions will not be provided here as its not fully proven out.
+To update your project with changes from the template:
+
+```bash
+sygkro project sync
+```
+
+This command:
+
+1. Loads the sync metadata from `.sygkro.sync.yaml`.
+2. Clones the template repository at the tracked commit.
+3. Re-renders the template using the stored inputs into a temporary “ideal” state.
+4. Computes a unified diff between the ideal output and the current project.
+5. Applies the diff to your project directory, updating files as necessary.
+6. Updates the `.sygkro.sync.yaml` file with the new template commit SHA.
 
 ### Configuration Files
 

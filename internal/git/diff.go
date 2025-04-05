@@ -65,8 +65,6 @@ func ComputeDiff(templateDir string, projectDir string, idealRevision string, sy
 		projectDifFilePath := filepath.Join(projectDir, relPath)
 		currentTmpDirFilePath := filepath.Join(currentTmpDir, relPath)
 
-		// fmt.Printf("Copying File from %s to %s\n", projectDifFilePath, currentTmpDirFilePath)
-
 		// if the file is a directory, create the directory in the currentTmpDir
 		if info.IsDir() {
 			return os.MkdirAll(filepath.Join(currentTmpDir, relPath), info.Mode())
