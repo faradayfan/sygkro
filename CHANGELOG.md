@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0-alpha.1](https://github.com/faradayfan/sygkro/compare/v0.3.0-alpha...v0.3.0-alpha.1) (2025-04-05)
+
+
+### Features
+
+* adding sync command wip ([f397011](https://github.com/faradayfan/sygkro/commit/f397011ffaa6a62fd5353f1284caf158e55e6fef))
+
 ## [0.3.0-alpha](https://github.com/faradayfan/sygkro/compare/v0.2.1-alpha...v0.3.0-alpha) (2025-04-05)
 
 
