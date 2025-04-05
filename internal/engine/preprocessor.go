@@ -27,10 +27,8 @@ func PreprocessRawBlocks(content string) (string, map[string]string, error) {
 
 	// Replace each found raw block with a unique placeholder.
 	processedContent := re.ReplaceAllStringFunc(content, func(match string) string {
-		// Extract the inner content.
 		submatches := re.FindStringSubmatch(match)
 		if len(submatches) < 2 {
-			// If no match group, return the original content.
 			return match
 		}
 		rawContent := submatches[1]

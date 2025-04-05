@@ -9,7 +9,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// WriteSyncConfig marshals the sync configuration and writes it to the destination directory.
 func WriteSyncConfig(destination string, syncConfig config.SyncConfig) error {
 	data, err := yaml.Marshal(syncConfig)
 	if err != nil {

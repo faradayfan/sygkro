@@ -23,16 +23,13 @@ var templateNewCmd = &cobra.Command{
 			"author":      "Your Name",
 		}
 
-		// create template directory
 		templateDir := filepath.Join(templateName)
 		templateFilesDir := filepath.Join(templateDir, "{{ .slug }}")
 
-		// Check if directory already exists
 		if _, err := os.Stat(templateDir); err == nil {
 			return fmt.Errorf("directory %s already exists", templateDir)
 		}
 
-		// Create directory
 		if err := os.Mkdir(templateDir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
@@ -41,7 +38,6 @@ var templateNewCmd = &cobra.Command{
 			return fmt.Errorf("failed to create directory: %w", err)
 		}
 
-		// Generate .sygkro.yaml file
 		configFilePath := filepath.Join(templateDir, config.TemplateConfigFileName)
 		templateConfig := config.TemplateConfig{
 			Name:        templateName,
@@ -56,7 +52,6 @@ var templateNewCmd = &cobra.Command{
 			return fmt.Errorf("failed to marshal config: %w", err)
 		}
 
-		// write README.md file, do not render.
 		readmeFilePath := filepath.Join(templateFilesDir, "README.md")
 		readmeFileContent, err := templates.GetTemplate("README.md.tpl")
 		if err != nil {

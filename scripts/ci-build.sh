@@ -4,4 +4,4 @@ set -e
 
 echo "Building"
 
-go build -o ./bin/sygkro ./main.go
+go build -o ./bin/sygkro_linux_amd64 ./main.go

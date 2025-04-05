@@ -45,34 +45,29 @@ func GetTemplateDir(templateRef string, reference string) (*TemplateDirResult, e
 		gitRef = parts[1]
 	}
 
-	// Override gitRef with the separate reference parameter if provided.
 	if reference != "" {
 		gitRef = reference
 	}
 
-	// Convert simplified syntax to SSH URL if needed.
 	if strings.HasPrefix(templateRef, "gh:") {
 		repoSpec := strings.TrimPrefix(templateRef, "gh:")
 		templateRef = fmt.Sprintf("git@github.com:%s.git", repoSpec)
 	}
 
-	// Check if the templateRef is a valid Git URL.
 	if strings.HasPrefix(templateRef, "git@github.com:") ||
 		(strings.HasPrefix(templateRef, "https://github.com/") && strings.HasSuffix(templateRef, ".git")) {
 
 		repoURL := templateRef
 
-		// Create a temporary directory for cloning.
 		tmpDir, err := os.MkdirTemp("", "sygkro-template-*")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create temporary directory: %w", err)
 		}
-		// Define a cleanup function to remove the temporary directory.
+
 		cleanup := func() {
 			os.RemoveAll(tmpDir)
 		}
 
-		// Ensure that on error the temporary directory is cleaned up.
 		success := false
 		defer func() {
 			if !success {
@@ -80,7 +75,6 @@ func GetTemplateDir(templateRef string, reference string) (*TemplateDirResult, e
 			}
 		}()
 
-		// Set up clone options.
 		cloneOpts := &git.CloneOptions{
 			URL: repoURL,
 		}
@@ -143,7 +137,6 @@ func GetTemplateDir(templateRef string, reference string) (*TemplateDirResult, e
 		}
 		commitSHA := head.Hash().String()
 
-		// Mark the operation as successful so that the deferred cleanup is not triggered.
 		success = true
 		return &TemplateDirResult{
 			Path:      tmpDir,
@@ -153,7 +146,6 @@ func GetTemplateDir(templateRef string, reference string) (*TemplateDirResult, e
 		}, nil
 	}
 
-	// Otherwise, assume it's a local directory.
 	return &TemplateDirResult{
 		Path:    templateRef,
 		Cleanup: func() {},

@@ -9,8 +9,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// WriteYAML writes the given data as YAML to the specified file path using a standard format.
-// It uses 2 spaces per indent.
 func WriteYAML(filePath string, data interface{}) error {
 	var buf bytes.Buffer
 	encoder := yaml.NewEncoder(&buf)

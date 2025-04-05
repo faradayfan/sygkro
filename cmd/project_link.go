@@ -15,6 +15,6 @@ var projectLinkCmd = &cobra.Command{
 	Short: "Links an existing project to a template",
 	Long:  `Links an existing project to a template`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Generating a new project template...")
+		fmt.Println("Not yet implemented")
 	},
 }
