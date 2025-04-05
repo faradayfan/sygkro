@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0-alpha](https://github.com/faradayfan/sygkro/compare/v0.2.1-alpha...v0.3.0-alpha) (2025-04-05)
+
+
+### Features
+
+* adding support for conditional rendering ([c9d4d40](https://github.com/faradayfan/sygkro/commit/c9d4d409927cf5a54c84981b83dd237eb04e07bc))
+* basic templating engine ([5d3734d](https://github.com/faradayfan/sygkro/commit/5d3734da4a670aa3c469e2c563832fef9568c087))
+* git based template support (branch, tag, commit) ([5e2e795](https://github.com/faradayfan/sygkro/commit/5e2e795210520e4b61c4e086af4c39c446000ddc))
+* project diff command ([45609cb](https://github.com/faradayfan/sygkro/commit/45609cb73d1217c024d2424bf3506880ad7c5c19))
+* project sync command ([a05ac5e](https://github.com/faradayfan/sygkro/commit/a05ac5e163b1ee519b709158bb0d6594fd960f8f))
+* stubbing out commands ([55de32c](https://github.com/faradayfan/sygkro/commit/55de32c4e9c7ad274a7230f4f7b82eb76f4f0ed3))
+
+
+### Bug Fixes
+
+* bug when using tag for git-ref ([4208717](https://github.com/faradayfan/sygkro/commit/420871779b80645da53f300f7dd55bf5c9539e7d))
+
 ## [0.2.1-alpha](https://github.com/faradayfan/sygkro/compare/v0.2.0...v0.2.1-alpha) (2025-03-29)
 
 
