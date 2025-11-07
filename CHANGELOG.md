@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0-alpha.2](https://github.com/faradayfan/sygkro/compare/v0.3.0-alpha.1...v0.3.0-alpha.2) (2025-11-07)
+
+
+### Bug Fixes
+
+* fixed bug with templateRef type determination ([b2c93a4](https://github.com/faradayfan/sygkro/commit/b2c93a4eaebb5050a3abf20c1de85964f7758b37))
+
 ## [0.3.0-alpha.1](https://github.com/faradayfan/sygkro/compare/v0.3.0-alpha...v0.3.0-alpha.1) (2025-04-05)
 
 
