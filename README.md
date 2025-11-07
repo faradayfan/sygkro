@@ -82,6 +82,8 @@ sygkro project create --template <template-ref> --target <target-directory>
 
 - `<template-ref>`:
   A local path or Git repository reference. Supported formats:
+
+  - Path: `/path/to/local/template`
   - Simplified syntax: `gh:owner/repo`
   - HTTPS URL: `https://github.com/owner/repo.git`
   - SSH URL: `git@github.com:owner/repo.git`

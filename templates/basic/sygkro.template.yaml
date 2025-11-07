@@ -1,0 +1,9 @@
+name: basic
+description: A new template created by sygkro
+version: ""
+templating:
+  inputs:
+    author: Your Name
+    description: A new project created by sygkro
+    name: my-project
+    slug: my-project
