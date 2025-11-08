@@ -13,7 +13,13 @@ import (
 var templateNewCmd = &cobra.Command{
 	Use:   "new [template-name]",
 	Short: "Creates a new template directory with necessary files",
-	Args:  cobra.ExactArgs(1),
+	Long: `Creates a new template directory with necessary files.
+	1. Creates a new directory with the specified template name.
+	2. Creates a sygkro.template.yaml file with default configuration.
+	3. Creates a subdirectory named '{{ .slug }}' for template files.
+	4. Adds a sample README.md file in the template files directory.
+	`,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		templateName := args[0]
 		templateInputs := map[string]string{

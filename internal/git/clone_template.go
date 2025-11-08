@@ -68,7 +68,7 @@ func GetTemplateDir(templateRef string, reference string) (*TemplateDirResult, e
 		isCommit bool
 		isTag    bool
 	)
-	gitRef := ""
+	gitRef := reference
 
 	templateRefType := GetTemplateReferenceType(templateRef)
 
@@ -121,6 +121,8 @@ func GetTemplateDir(templateRef string, reference string) (*TemplateDirResult, e
 		// If no ref is provided, perform a shallow clone of the default branch.
 		cloneOpts.Depth = 1
 	}
+
+	// print out clone options for debugging
 
 	// Clone the repository.
 	repo, err := git.PlainClone(tmpDir, false, cloneOpts)

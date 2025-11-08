@@ -1,5 +1,7 @@
 # Contributing to sygkro
 
+> IMPORTANT!!!: THIS PROJECT IS LICENSED UNDER THE MIT LICENSE. BY CONTRIBUTING, YOU AGREE THAT YOUR CONTRIBUTIONS WILL BE LICENSED UNDER THE MIT LICENSE OUTLINED IN THE [LICENSE FILE](LICENSE.md).
+
 Thank you for your interest in contributing to sygkro! We welcome contributions of all kinds—from bug reports and feature requests to pull requests with code improvements. This document provides guidelines to help you get started and ensure that your contributions align with our project’s goals and coding standards.
 
 ## Table of Contents
@@ -33,18 +35,32 @@ We appreciate your help improving sygkro. Here’s how to get started:
 1. **Fork the Repository:**  
    Fork the sygkro repository on GitHub.
 
-2. **Clone Your Fork Locally:**  
-  
-  ```bash
-   git clone https://github.com/yourusername/sygkro.git
-   cd sygkro
-  ```
+2. **Clone Your Fork Locally:**
 
-3. **Create a Feature Branch:**  
-  
-  ```bash
-   git checkout -b feature/your-feature-name
-  ```
+```bash
+git clone https://github.com/yourusername/sygkro.git
+cd sygkro
+```
+
+3. Install Dependencies and setup git hooks:
+
+```bash
+asdf install
+lefthook install
+go mod download
+```
+
+4. **Create a Feature Branch:**
+
+```bash
+ git checkout -b feature/your-feature-name
+```
+
+5. **Make Your Changes:**  
+   Implement your feature or bug fix. Ensure your code adheres to the project’s coding standards.
+
+6. **Write Tests:**  
+   Add or update tests to cover your changes. Ensure all tests pass before submitting your pull request.
 
 ### Branching and Commit Messages
 
@@ -83,6 +99,7 @@ We appreciate your help improving sygkro. Here’s how to get started:
 
 - Describe Your Changes:
   In your pull request description, include:
+
   - What changes you made.
   - Why these changes are necessary.
   - Any relevant issue numbers (e.g., "Fixes #123").

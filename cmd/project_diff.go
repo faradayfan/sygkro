@@ -12,6 +12,13 @@ import (
 var projectDiffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Outputs a git diff style output between the project and its template",
+	Long: `Outputs a git diff style output between the project and its template.
+	1. Reads the sygkro.sync.yaml file to get the template source and inputs.
+	2. Clones the template repository at the specified reference to a temporary location.
+	3. Generates the ideal state of the project based on the template and inputs.
+	4. Computes the diff between the current project and the ideal state for files tracked by the template.
+	5. Outputs the diff in a git diff style format.
+	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		syncFilePath := cmd.Flag("config").Value.String()
 		syncConfig, err := config.ReadSyncConfig(syncFilePath)

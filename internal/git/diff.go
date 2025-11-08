@@ -55,6 +55,7 @@ func ComputeDiff(templateDir string, projectDir string, idealRevision string, sy
 
 	// for every file in the templateDir, copy the files with the same name from the projectDir into currentTmpDir
 	walkErr := filepath.Walk(idealTmpDir, func(path string, info os.FileInfo, err error) error {
+		// print the path
 		if err != nil {
 			return err
 		}
@@ -70,12 +71,19 @@ func ComputeDiff(templateDir string, projectDir string, idealRevision string, sy
 			return os.MkdirAll(filepath.Join(currentTmpDir, relPath), info.Mode())
 		}
 
-		// if the file exists in the projectDir and is not a directory, copy it to the currentTmpDir
-		content, err := os.ReadFile(projectDifFilePath)
-		if err != nil {
+		if _, err := os.Stat(projectDifFilePath); err == nil {
+			// if the file exists in the projectDir
+			// copy it to the currentTmpDir
+			content, err := os.ReadFile(projectDifFilePath)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(currentTmpDirFilePath, content, info.Mode())
+		} else if os.IsNotExist(err) {
+			return nil
+		} else {
 			return err
 		}
-		return os.WriteFile(currentTmpDirFilePath, content, info.Mode())
 	})
 
 	if walkErr != nil {
