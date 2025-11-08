@@ -53,10 +53,11 @@ jobs:
       TAG_NAME: ${{ needs.release.outputs.tag-name }}
     steps:
       - uses: actions/checkout@v4
-      - uses: asdf-vm/actions/install@v3
+      - uses: asdf-vm/actions/install@v4
       - run: ./scripts/ci-setup.sh
       - run: ./scripts/ci-pre-build.sh
       - run: ./scripts/ci-build.sh
+      - run: ./scripts/ci-post-build.sh
       - run: ./scripts/ci-pre-deploy.sh
       - run: ./scripts/ci-deploy.sh
       - run: ./scripts/ci-post-deploy.sh

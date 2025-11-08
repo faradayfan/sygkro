@@ -15,6 +15,7 @@
     - [Usage](#usage)
       - [Creating a New Template](#creating-a-new-template)
       - [Creating a New Project](#creating-a-new-project)
+      - [Linking an Existing Project to a Template](#linking-an-existing-project-to-a-template)
       - [Viewing Differences](#viewing-differences)
       - [Syncing Projects with Template Changes](#syncing-projects-with-template-changes)
     - [Configuration Files](#configuration-files)
@@ -81,7 +82,9 @@ sygkro project create --template <template-ref> --target <target-directory>
 ```
 
 - `<template-ref>`:
-  A local path or Git repository reference. Supported formats:
+  A local path or remote Git repository reference. Supported formats:
+
+  > Template must be a git repository, and must have a clean working tree.
 
   - Path: `/path/to/local/template`
   - Simplified syntax: `gh:owner/repo`
@@ -90,6 +93,16 @@ sygkro project create --template <template-ref> --target <target-directory>
 
 - `<target-directory>`:
   The directory where the project will be created (defaults to the current directory).
+
+#### Linking an Existing Project to a Template
+
+To link an existing project directory to a template:
+
+```bash
+sygkro project link --template <template-ref> --target <project-directory>
+```
+
+Similar to project creation, `<template-ref>` can be a local path or remote Git repository reference. `<project-directory>` is the path to the existing project you want to link. This command will create a `.sygkro.sync.yaml` file in the project directory to track the template source and inputs used. Once linked, you can use the `sygkro project diff` to view differences and the `sygkro project sync` command to synchronize the project with the template.
 
 #### Viewing Differences
 

@@ -11,7 +11,14 @@ import (
 var projectSyncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Syncs a project to a template",
-	Long:  `Syncs a project to a template`,
+	Long: `Syncs a project to a template
+		1. Reads the sygkro.sync.yaml file to get the template source and inputs.
+		2. Clones the template repository at the specified reference to a temporary location.
+		3. Generates the ideal state of the project based on the template and inputs.
+		4. Computes the diff between the current project and the ideal state for files tracked by the template.
+		5. Applies the diff to the project.
+		6. Updates the sygkro.sync.yaml file with the new template version.
+	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		syncFilePath := cmd.Flag("config").Value.String()
 		syncConfig, err := config.ReadSyncConfig(syncFilePath)
@@ -38,6 +45,8 @@ var projectSyncCmd = &cobra.Command{
 			fmt.Println("No differences found.")
 			return nil
 		}
+
+		// fmt.Print(diff)
 
 		if err := git.ApplyDiff(".", diff); err != nil {
 			return fmt.Errorf("failed to apply diff: %w", err)

@@ -15,8 +15,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: asdf-vm/actions/install@v3
+      - uses: asdf-vm/actions/install@v4
       - run: ./scripts/ci-setup.sh
       - run: ./scripts/ci-pre-build.sh
       - run: ./scripts/ci-build.sh
+      - run: ./scripts/ci-post-build.sh
 # {% endraw %}

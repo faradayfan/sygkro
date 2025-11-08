@@ -16,7 +16,15 @@ import (
 var projectCreateCmd = &cobra.Command{
 	Use:   "create --template [template-ref]",
 	Short: "Generates a new project from a template directory or Git repo into a new project directory under the target directory",
-	Args:  cobra.ExactArgs(0),
+	Long: `Generates a new project from a template directory or Git repo into a new project directory under the target directory.
+	1. Clones or copies the template to a temporary location.
+	2. Reads the template configuration from sygkro.template.yaml.
+	3. Prompts the user for input values defined in the template.
+	4. Renders the template files and directory names with the provided inputs.
+	5. Creates a new project directory under the target directory with the rendered content.
+	6. Writes a sygkro.sync.yaml file to track the template source and inputs used.
+	`,
+	Args: cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		targetDir, err := cmd.Flags().GetString("target")
 		if err != nil {
@@ -56,19 +64,30 @@ var projectCreateCmd = &cobra.Command{
 		}
 
 		inputs := make(map[string]string)
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("Please provide values for the following inputs:")
-		for key, defaultVal := range tmplConfig.Templating.Inputs {
-			fmt.Printf("%s (default: %s): ", key, defaultVal)
-			userInput, err := reader.ReadString('\n')
-			if err != nil {
-				return fmt.Errorf("error reading input for %s: %w", key, err)
+		quietMode, err := cmd.Flags().GetBool("quiet")
+		if err != nil {
+			return err
+		}
+
+		if quietMode {
+			for key, defaultVal := range tmplConfig.Templating.Inputs {
+				inputs[key] = defaultVal
 			}
-			userInput = strings.TrimSpace(userInput)
-			if userInput == "" {
-				userInput = defaultVal
+		} else {
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Println("Please provide values for the following inputs:")
+			for key, defaultVal := range tmplConfig.Templating.Inputs {
+				fmt.Printf("%s (default: %s): ", key, defaultVal)
+				userInput, err := reader.ReadString('\n')
+				if err != nil {
+					return fmt.Errorf("error reading input for %s: %w", key, err)
+				}
+				userInput = strings.TrimSpace(userInput)
+				if userInput == "" {
+					userInput = defaultVal
+				}
+				inputs[key] = userInput
 			}
-			inputs[key] = userInput
 		}
 
 		renderedProjectDir, err := engine.RenderString("{{ .slug }}", inputs)
@@ -118,5 +137,6 @@ func init() {
 	projectCreateCmd.Flags().StringP("template", "s", "", "Path or Git repo reference to the template (required)")
 	projectCreateCmd.Flags().StringP("target", "t", ".", "Target directory for the new project")
 	projectCreateCmd.Flags().StringP("git-ref", "r", "", "Git reference (branch, tag, or commit SHA) to use for the template")
+	projectCreateCmd.Flags().BoolP("quiet", "q", false, "Accepts default values for all inputs without prompting the user")
 	projectCreateCmd.MarkFlagRequired("template")
 }
