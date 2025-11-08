@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0-alpha.3](https://github.com/faradayfan/sygkro/compare/v0.3.0-alpha.2...v0.3.0-alpha.3) (2025-11-08)
+
+
+### Features
+
+* filling out the project link command ([394991e](https://github.com/faradayfan/sygkro/commit/394991e92a073a7fe2a81ec0e66b7659236dcc7a))
+
 ## [0.3.0-alpha.2](https://github.com/faradayfan/sygkro/compare/v0.3.0-alpha.1...v0.3.0-alpha.2) (2025-11-07)
 
 
