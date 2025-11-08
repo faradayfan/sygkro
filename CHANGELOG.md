@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/faradayfan/sygkro/compare/v0.4.0...v0.4.1) (2025-11-08)
+
+
+### Bug Fixes
+
+* bump actions/checkout from 4 to 5 ([1d887c5](https://github.com/faradayfan/sygkro/commit/1d887c56acfc7d9f48c5913b8444fe5543b714e8))
+* updating dependencies ([bf82952](https://github.com/faradayfan/sygkro/commit/bf829526e8d5db04dc6e44cbf97ef73f4223f4b5))
+
 ## [0.4.0](https://github.com/faradayfan/sygkro/compare/v0.3.0...v0.4.0) (2025-11-08)
 
 
