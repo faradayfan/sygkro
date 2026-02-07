@@ -24,7 +24,8 @@ func runCommand(execDir string, command string, args ...string) (string, error) 
 	return stdout.String(), nil
 }
 
-func gitCheckout(repoPath string, commitish string) error {
+// GitCheckout checks out a specific commit, branch, or tag in the given repo.
+func GitCheckout(repoPath string, commitish string) error {
 	stdOut, err := runCommand(repoPath, "git", "checkout", commitish)
 	if err != nil {
 		return fmt.Errorf("git checkout failed: %w: %s", err, stdOut)
