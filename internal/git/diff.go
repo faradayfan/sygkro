@@ -87,11 +87,54 @@ func ComputeDiff(templateDir string, projectDir string, idealRevision string, sy
 	})
 
 	if walkErr != nil {
-		return "", fmt.Errorf("failed to walk template directory: %w", err)
+		return "", fmt.Errorf("failed to walk template directory: %w", walkErr)
 	}
 
 	// compute the diff between the current and ideal temporary directories
 	diff, err := gitDiff(currentTmpDir, idealTmpDir)
+	if err != nil {
+		return "", fmt.Errorf("failed to compute diff: %w", err)
+	}
+
+	return diff, nil
+}
+
+// ComputeTemplateDiff renders the template at both the old and new versions
+// and returns a unified diff showing only what changed in the template.
+// This is useful for previewing what a sync will bring in.
+//
+// templateDir should be a cloned repo with full history (use GetTemplateDirForSync).
+// oldVersion is the commit SHA of the previously synced template version.
+func ComputeTemplateDiff(templateDir string, oldVersion string, syncConfig *config.SyncConfig) (string, error) {
+	// Render NEW template (current HEAD)
+	newTmpDir, err := os.MkdirTemp("", "sygkro-diff-new-*")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp dir: %w", err)
+	}
+	defer os.RemoveAll(newTmpDir)
+
+	if err := RenderTemplateAtPath(templateDir, newTmpDir, syncConfig.Inputs); err != nil {
+		return "", fmt.Errorf("failed to render new template: %w", err)
+	}
+
+	// Render OLD template
+	oldTmpDir, err := os.MkdirTemp("", "sygkro-diff-old-*")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp dir: %w", err)
+	}
+	defer os.RemoveAll(oldTmpDir)
+
+	if oldVersion != "" {
+		if err := GitCheckout(templateDir, oldVersion); err != nil {
+			return "", fmt.Errorf("failed to checkout old version %s: %w", oldVersion, err)
+		}
+		if err := RenderTemplateAtPath(templateDir, oldTmpDir, syncConfig.Inputs); err != nil {
+			return "", fmt.Errorf("failed to render old template: %w", err)
+		}
+	}
+	// If oldVersion is empty (first sync), oldTmpDir stays empty — everything shows as added
+
+	diff, err := gitDiff(oldTmpDir, newTmpDir)
 	if err != nil {
 		return "", fmt.Errorf("failed to compute diff: %w", err)
 	}

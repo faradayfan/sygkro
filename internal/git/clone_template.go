@@ -173,3 +173,100 @@ func GetTemplateDir(templateRef string, reference string) (*TemplateDirResult, e
 		Cleanup:   cleanup,
 	}, nil
 }
+
+// GetTemplateDirForSync clones a template repository with full history so that
+// both old and new commits are available for 3-way merge during sync.
+// Unlike GetTemplateDir which uses shallow clones for speed, this always
+// fetches the complete history.
+func GetTemplateDirForSync(templateRef string, reference string) (*TemplateDirResult, error) {
+	var isTag bool
+	gitRef := reference
+
+	templateRefType := GetTemplateReferenceType(templateRef)
+
+	switch templateRefType {
+	case TemplateReferenceTypeUnknown:
+		return nil, fmt.Errorf("unsupported template reference format: %s", templateRef)
+	case TemplateReferenceTypeSimpleGH:
+		repoSpec := strings.TrimPrefix(templateRef, "gh:")
+		templateRef = fmt.Sprintf("git@github.com:%s.git", repoSpec)
+	case TemplateReferenceTypeLocalPath:
+		return &TemplateDirResult{
+			Path:    templateRef,
+			Cleanup: func() {},
+		}, nil
+	}
+
+	tmpDir, err := os.MkdirTemp("", "sygkro-template-sync-*")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create temporary directory: %w", err)
+	}
+
+	cleanup := func() {
+		os.RemoveAll(tmpDir)
+	}
+
+	success := false
+	defer func() {
+		if !success {
+			cleanup()
+		}
+	}()
+
+	// Always clone with full history for sync operations.
+	cloneOpts := &git.CloneOptions{
+		URL: templateRef,
+	}
+
+	if gitRef != "" && !commitRegex.MatchString(gitRef) {
+		cloneOpts.ReferenceName = plumbing.NewBranchReferenceName(gitRef)
+		cloneOpts.SingleBranch = true
+	}
+
+	repo, err := git.PlainClone(tmpDir, false, cloneOpts)
+	if err != nil && gitRef != "" && !commitRegex.MatchString(gitRef) {
+		// If branch clone fails, try assuming it's a tag.
+		cloneOpts.ReferenceName = plumbing.NewTagReferenceName(gitRef)
+		repo, err = git.PlainClone(tmpDir, false, cloneOpts)
+		isTag = true
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to clone repository %s: %w", templateRef, err)
+	}
+
+	// If gitRef is a commit SHA, checkout that commit.
+	if gitRef != "" && commitRegex.MatchString(gitRef) {
+		wt, err := repo.Worktree()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get worktree: %w", err)
+		}
+		err = wt.Checkout(&git.CheckoutOptions{
+			Hash: plumbing.NewHash(gitRef),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to checkout commit %s: %w", gitRef, err)
+		}
+	}
+
+	head, err := repo.Head()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get HEAD commit: %w", err)
+	}
+	headRef := head.Name().String()
+	if isTag {
+		tagHead, err := repo.Tag(gitRef)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get tag %s: %w", gitRef, err)
+		}
+		headRef = tagHead.Name().String()
+	}
+	commitSHA := head.Hash().String()
+
+	success = true
+	return &TemplateDirResult{
+		Path:      tmpDir,
+		CommitSHA: commitSHA,
+		HeadRef:   headRef,
+		Cleanup:   cleanup,
+	}, nil
+}

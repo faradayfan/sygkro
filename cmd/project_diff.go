@@ -11,13 +11,14 @@ import (
 
 var projectDiffCmd = &cobra.Command{
 	Use:   "diff",
-	Short: "Outputs a git diff style output between the project and its template",
-	Long: `Outputs a git diff style output between the project and its template.
+	Short: "Shows what the template changed between the synced version and the latest",
+	Long: `Shows a unified diff of template changes between the previously synced version
+and the latest version. This previews what 'project sync' will bring in, showing
+only template-side changes (not project customizations).
 	1. Reads the sygkro.sync.yaml file to get the template source and inputs.
-	2. Clones the template repository at the specified reference to a temporary location.
-	3. Generates the ideal state of the project based on the template and inputs.
-	4. Computes the diff between the current project and the ideal state for files tracked by the template.
-	5. Outputs the diff in a git diff style format.
+	2. Clones the template repository with full history.
+	3. Renders the template at both the old (synced) and new (latest) versions.
+	4. Outputs the diff between the two rendered versions.
 	`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		syncFilePath := cmd.Flag("config").Value.String()
@@ -31,13 +32,13 @@ var projectDiffCmd = &cobra.Command{
 			syncConfig.Source.TemplateTrackingRef = gitRef
 		}
 
-		templateDir, err := git.GetTemplateDir(syncConfig.Source.TemplatePath, syncConfig.Source.TemplateTrackingRef)
+		templateDir, err := git.GetTemplateDirForSync(syncConfig.Source.TemplatePath, syncConfig.Source.TemplateTrackingRef)
 		if err != nil {
 			return fmt.Errorf("failed to clone template repository: %w", err)
 		}
 		defer templateDir.Cleanup()
 
-		diff, err := git.ComputeDiff(templateDir.Path, ".", syncConfig.Source.TemplateVersion, syncConfig)
+		diff, err := git.ComputeTemplateDiff(templateDir.Path, syncConfig.Source.TemplateVersion, syncConfig)
 		if err != nil {
 			return fmt.Errorf("failed to compute diff: %w", err)
 		}
