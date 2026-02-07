@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.2](https://github.com/faradayfan/sygkro/compare/v0.4.1...v0.4.2) (2026-02-07)
+
+
+### Bug Fixes
+
+* bump github.com/spf13/cobra from 1.10.1 to 1.10.2 ([726b47d](https://github.com/faradayfan/sygkro/commit/726b47dda25532063a6586e84f20268b583e8f26))
+* fixing 3 way merge issue ([4ac93e4](https://github.com/faradayfan/sygkro/commit/4ac93e4bbf21d0c81b3b561245e170a3c809f46c))
+* updating checkout action ([a2fe5d1](https://github.com/faradayfan/sygkro/commit/a2fe5d112e008525d838c8c31d22104a41b4f0d8))
+* updating dependencies ([903eba9](https://github.com/faradayfan/sygkro/commit/903eba91d4fa8092581b7c01a64c37c6589d3964))
+
 ## [0.4.1](https://github.com/faradayfan/sygkro/compare/v0.4.0...v0.4.1) (2025-11-08)
 
 
