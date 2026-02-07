@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	version = "0.4.1" // x-release-please-version
+	version = "0.4.2" // x-release-please-version
 )
 
 func init() {
