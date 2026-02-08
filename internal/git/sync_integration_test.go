@@ -11,9 +11,10 @@ import (
 )
 
 // initGitRepo creates a git repo in dir with an initial commit.
+// Uses -b main to ensure consistent branch naming across platforms.
 func initGitRepo(t *testing.T, dir string) {
 	t.Helper()
-	run(t, dir, "git", "init")
+	run(t, dir, "git", "init", "-b", "main")
 	run(t, dir, "git", "config", "user.email", "test@test.com")
 	run(t, dir, "git", "config", "user.name", "Test")
 }
@@ -35,6 +36,13 @@ func run(t *testing.T, dir, cmd string, args ...string) string {
 		t.Fatalf("command %q %v in %s failed: %v\n%s", cmd, args, dir, err, out)
 	}
 	return string(out)
+}
+
+func mustCheckout(t *testing.T, repoDir, ref string) {
+	t.Helper()
+	if err := GitCheckout(repoDir, ref); err != nil {
+		t.Fatalf("git checkout %s failed: %v", ref, err)
+	}
 }
 
 func writeFile(t *testing.T, path, content string) {
@@ -126,7 +134,7 @@ func TestSyncIntegration_FullFlow(t *testing.T) {
 	}
 
 	// --- Step 1: Simulate "project create" at v1 ---
-	GitCheckout(templateRepo, v1sha)
+	mustCheckout(t, templateRepo, v1sha)
 
 	projectDir := t.TempDir()
 	if err := RenderTemplateAtPath(templateRepo, projectDir, inputs); err != nil {
@@ -157,7 +165,7 @@ func TestSyncIntegration_FullFlow(t *testing.T) {
 	os.Remove(filepath.Join(projectDir, "docs", "guide.md"))
 
 	// --- Step 3: Render OLD (v1) and NEW (v2) templates ---
-	GitCheckout(templateRepo, "main")
+	mustCheckout(t, templateRepo, "main")
 
 	// Render NEW (v2) template
 	theirsDir := t.TempDir()
@@ -166,7 +174,7 @@ func TestSyncIntegration_FullFlow(t *testing.T) {
 	}
 
 	// Render OLD (v1) template
-	GitCheckout(templateRepo, v1sha)
+	mustCheckout(t, templateRepo, v1sha)
 	baseDir := t.TempDir()
 	if err := RenderTemplateAtPath(templateRepo, baseDir, inputs); err != nil {
 		t.Fatalf("failed to render v1 template: %v", err)
@@ -292,7 +300,7 @@ func TestSyncIntegration_NoChanges(t *testing.T) {
 	inputs := map[string]string{"name": "My App", "slug": "my-app"}
 
 	// Render project at v1
-	GitCheckout(templateRepo, v1sha)
+	mustCheckout(t, templateRepo, v1sha)
 	projectDir := t.TempDir()
 	if err := RenderTemplateAtPath(templateRepo, projectDir, inputs); err != nil {
 		t.Fatal(err)
@@ -347,7 +355,7 @@ func TestSyncIntegration_FirstSync(t *testing.T) {
 		"# My App\nExisting project readme.\n")
 
 	// No old version — base is empty
-	GitCheckout(templateRepo, "main")
+	mustCheckout(t, templateRepo, "main")
 	baseDir := t.TempDir() // empty
 
 	theirsDir := t.TempDir()
@@ -403,7 +411,7 @@ func TestSyncIntegration_TemplateDeletesFile(t *testing.T) {
 	inputs := map[string]string{"name": "My App", "slug": "my-app"}
 
 	// Render project at v1
-	GitCheckout(templateRepo, v1sha)
+	mustCheckout(t, templateRepo, v1sha)
 	projectDir := t.TempDir()
 	if err := RenderTemplateAtPath(templateRepo, projectDir, inputs); err != nil {
 		t.Fatal(err)
@@ -419,7 +427,7 @@ func TestSyncIntegration_TemplateDeletesFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	GitCheckout(templateRepo, "main") // v2
+	mustCheckout(t, templateRepo, "main") // v2
 	theirsDir := t.TempDir()
 	if err := RenderTemplateAtPath(templateRepo, theirsDir, inputs); err != nil {
 		t.Fatal(err)
@@ -467,7 +475,7 @@ func TestSyncIntegration_ComputeTemplateDiff(t *testing.T) {
 	syncConfig := &config.SyncConfig{Inputs: inputs}
 
 	// Checkout v2 (HEAD) first, then diff against v1
-	GitCheckout(templateRepo, "main")
+	mustCheckout(t, templateRepo, "main")
 
 	diff, err := ComputeTemplateDiff(templateRepo, v1sha, syncConfig)
 	if err != nil {

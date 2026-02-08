@@ -4,10 +4,13 @@ set -e
 
 echo "Publishing"
 
-# use the gh CLI to publish the build artifact to the GitHub release
-# gh release upload "$GITHUB_REF_NAME" \
-#     --clobber \
-#     --title "$RELEASE_VERSION" \
-#     --notes "Release $RELEASE_VERSION" \
-#     --target "$GIT_SHA" \
-#     ./bin/sygkro_linux_amd64
+# Upload all build artifacts to the GitHub release created by release-please
+gh release upload "$TAG_NAME" \
+    --clobber \
+    ./bin/sygkro_linux_amd64 \
+    ./bin/sygkro_linux_arm64 \
+    ./bin/sygkro_darwin_amd64 \
+    ./bin/sygkro_darwin_arm64 \
+    ./bin/sygkro_windows_amd64.exe
+
+echo "Uploaded binaries to release $TAG_NAME"
