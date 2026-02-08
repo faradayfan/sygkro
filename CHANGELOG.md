@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.4](https://github.com/faradayfan/sygkro/compare/v0.4.3...v0.4.4) (2026-02-08)
+
+
+### Bug Fixes
+
+* pipeline fix ([cdf9fca](https://github.com/faradayfan/sygkro/commit/cdf9fcac3a290c39af9e402a40d34c443b30216b))
+
 ## [0.4.3](https://github.com/faradayfan/sygkro/compare/v0.4.2...v0.4.3) (2026-02-08)
 
 
