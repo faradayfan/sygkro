@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/faradayfan/sygkro/compare/v0.4.2...v0.4.3) (2026-02-08)
+
+
+### Bug Fixes
+
+* fix int tests, release binaries ([b2e40d7](https://github.com/faradayfan/sygkro/commit/b2e40d7e445a1885e65cadeb8854c488f77533f0))
+
 ## [0.4.2](https://github.com/faradayfan/sygkro/compare/v0.4.1...v0.4.2) (2026-02-07)
 
 
