@@ -48,6 +48,7 @@ jobs:
     permissions:
       contents: write
     env:
+      GH_TOKEN: ${{ github.token }}
       RELEASE_VERSION: ${{ needs.release.outputs.release-version }}
       GIT_SHA: ${{ github.sha }}
       TAG_NAME: ${{ needs.release.outputs.tag-name }}
